@@ -17,6 +17,7 @@
 #include "modules/drivers/lidar/velodyne/driver/driver.h"
 
 #include <cmath>
+#include <cstring>
 #include <ctime>
 #include <string>
 #include <thread>
@@ -42,7 +43,7 @@ void VelodyneDriver::Init() {
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.set_npackets(static_cast<int>(ceil(packet_rate_ / frequency)));
+  config_.set_npackets(static_cast<int>(std::ceil(packet_rate_ / frequency)));
   AINFO << "publishing " << config_.npackets() << " packets per scan";
 
   // open Velodyne input device
@@ -59,13 +60,12 @@ void VelodyneDriver::Init() {
 
 void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
                                              uint64_t* basetime) {
-  tm time;
+  struct tm time;
+  std::memset(&time, 0, sizeof(time));
   time.tm_year = nmea_time->year + (2000 - 1900);
   time.tm_mon = nmea_time->mon - 1;
   time.tm_mday = nmea_time->day;
   time.tm_hour = nmea_time->hour;
-  time.tm_min = 0;
-  time.tm_sec = 0;
 
   // set last gps time using gps socket packet
   last_gps_time_ =
@@ -78,39 +78,21 @@ void VelodyneDriver::SetBaseTimeFromNmeaTime(NMEATimePtr nmea_time,
   *basetime = unix_base * static_cast<uint64_t>(1e6);
 }
 
-bool VelodyneDriver::SetBaseTime() {
-  NMEATimePtr nmea_time(new NMEATime);
-  while (true) {
-    int rc = input_->get_positioning_data_packet(nmea_time);
-    if (rc == 0) {
-      break;  // got a full packet
-    }
-    if (rc < 0) {
-      return false;  // end of file reached
-    }
-  }
-
-  SetBaseTimeFromNmeaTime(nmea_time, &basetime_);
-  input_->init(config_.firing_data_port());
-  return true;
-}
-
 /** poll the device
  *
  *  @returns true unless end of file reached
  */
 bool VelodyneDriver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
-  // Allocate a new shared pointer for zero-copy sharing with other nodelets.
   if (basetime_ == 0) {
+    AWARN << "basetime is zero";
     // waiting for positioning data
     std::this_thread::sleep_for(std::chrono::microseconds(100));
-    AWARN << "basetime is zero";
     return false;
   }
 
   int poll_result = PollStandard(scan);
 
-  if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
+  if (poll_result == SOCKET_TIMEOUT || poll_result == RECEIVE_FAIL) {
     return false;  // poll again
   }
 
@@ -226,15 +208,12 @@ void VelodyneDriver::UpdateGpsTopHour(uint32_t current_time) {
 }
 
 VelodyneDriver* VelodyneDriverFactory::CreateDriver(const Config& config) {
-  auto new_config = config;
-  if (new_config.prefix_angle() > 35900 || new_config.prefix_angle() < 100) {
-    AWARN << "invalid prefix angle, prefix_angle must be between 100 and 35900";
-    if (new_config.prefix_angle() > 35900) {
-      new_config.set_prefix_angle(35900);
-    } else if (new_config.prefix_angle() < 100) {
-      new_config.set_prefix_angle(100);
-    }
+  auto prefix_angle = config.prefix_angle();
+  if (prefix_angle > 35900 || prefix_angle < 100) {
+    AERROR << "Invalid prefix_angle " << prefix_angle << ", should be in range [100, 35900]";
+    return nullptr;
   }
+
   VelodyneDriver* driver = nullptr;
   switch (config.model()) {
     case HDL64E_S2: {
@@ -273,7 +252,7 @@ VelodyneDriver* VelodyneDriverFactory::CreateDriver(const Config& config) {
       break;
     }
     default:
-      AERROR << "invalid model, must be 64E_S2|64E_S3S"
+      AERROR << "Model unsupported, should be one of 64E_S2|64E_S3S"
              << "|64E_S3D|VLP16|HDL32E|VLS128";
       break;
   }

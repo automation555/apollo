@@ -19,7 +19,6 @@
 #include <string>
 
 #include "modules/drivers/lidar/velodyne/driver/driver.h"
-// #include "ros/ros.h"
 
 namespace apollo {
 namespace drivers {
@@ -30,7 +29,7 @@ void Velodyne64Driver::Init() {
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
-  config_.set_npackets(static_cast<int>(ceil(packet_rate_ / frequency)));
+  config_.set_npackets(static_cast<int>(std::ceil(packet_rate_ / frequency)));
   AINFO << "publishing " << config_.npackets() << " packets per scan";
 
   input_.reset(new SocketInput());
@@ -46,7 +45,7 @@ bool Velodyne64Driver::Poll(const std::shared_ptr<VelodyneScan>& scan) {
   int poll_result =
       config_.use_sensor_sync() ? PollStandardSync(scan) : PollStandard(scan);
 
-  if (poll_result == SOCKET_TIMEOUT || poll_result == RECIEVE_FAIL) {
+  if (poll_result == SOCKET_TIMEOUT || poll_result == RECEIVE_FAIL) {
     return false;  // poll again
   }
 
