@@ -152,60 +152,90 @@ void FemPosDeviationOsqpInterface::CalculateKernel(
   columns.resize(num_of_variables_);
   int col_num = 0;
 
-  for (int col = 0; col < 2; ++col) {
-    columns[col].emplace_back(col, weight_fem_pos_deviation_ +
-                                       weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
-
-  for (int col = 2; col < 4; ++col) {
-    columns[col].emplace_back(
-        col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
-                                       2.0 * weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
-
-  int second_point_from_last_index = num_of_points_ - 2;
-  for (int point_index = 2; point_index < second_point_from_last_index;
-       ++point_index) {
-    int col_index = point_index * 2;
+  if (num_of_points_ == 3) {
     for (int col = 0; col < 2; ++col) {
-      col_index += col;
-      columns[col_index].emplace_back(col_index - 4, weight_fem_pos_deviation_);
-      columns[col_index].emplace_back(
-          col_index - 2,
-          -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
-      columns[col_index].emplace_back(
-          col_index, 6.0 * weight_fem_pos_deviation_ +
-                         2.0 * weight_path_length_ + weight_ref_deviation_);
+      columns[col].emplace_back(col, weight_fem_pos_deviation_ +
+                                         weight_path_length_ +
+                                         weight_ref_deviation_);
       ++col_num;
     }
-  }
 
-  int second_point_col_from_last_col = num_of_variables_ - 4;
-  int last_point_col_from_last_col = num_of_variables_ - 2;
-  for (int col = second_point_col_from_last_col;
-       col < last_point_col_from_last_col; ++col) {
-    columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
-    columns[col].emplace_back(
-        col - 2, -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
-                                       2.0 * weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
-  }
+    for (int col = 2; col < 4; ++col) {
+      columns[col].emplace_back(
+          col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
+      columns[col].emplace_back(col, 4.0 * weight_fem_pos_deviation_ +
+                                         2.0 * weight_path_length_ +
+                                         weight_ref_deviation_);
+      ++col_num;
+    }
 
-  for (int col = last_point_col_from_last_col; col < num_of_variables_; ++col) {
-    columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
-    columns[col].emplace_back(
-        col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, weight_fem_pos_deviation_ +
-                                       weight_path_length_ +
-                                       weight_ref_deviation_);
-    ++col_num;
+    for (int col = 4; col < 6; ++col) {
+      columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
+      columns[col].emplace_back(
+          col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
+      columns[col].emplace_back(col, weight_fem_pos_deviation_ +
+                                         weight_path_length_ +
+                                         weight_ref_deviation_);
+      ++col_num;
+    }
+  } else {
+    for (int col = 0; col < 2; ++col) {
+      columns[col].emplace_back(col, weight_fem_pos_deviation_ +
+                                         weight_path_length_ +
+                                         weight_ref_deviation_);
+      ++col_num;
+    }
+
+    for (int col = 2; col < 4; ++col) {
+      columns[col].emplace_back(
+          col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
+      columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
+                                         2.0 * weight_path_length_ +
+                                         weight_ref_deviation_);
+      ++col_num;
+    }
+
+    int second_point_from_last_index = num_of_points_ - 2;
+    for (int point_index = 2; point_index < second_point_from_last_index;
+         ++point_index) {
+      int col_index = point_index * 2;
+      for (int col = 0; col < 2; ++col) {
+        col_index += col;
+        columns[col_index].emplace_back(col_index - 4,
+                                        weight_fem_pos_deviation_);
+        columns[col_index].emplace_back(
+            col_index - 2,
+            -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
+        columns[col_index].emplace_back(
+            col_index, 6.0 * weight_fem_pos_deviation_ +
+                           2.0 * weight_path_length_ + weight_ref_deviation_);
+        ++col_num;
+      }
+    }
+
+    int second_point_col_from_last_col = num_of_variables_ - 4;
+    int last_point_col_from_last_col = num_of_variables_ - 2;
+    for (int col = second_point_col_from_last_col;
+         col < last_point_col_from_last_col; ++col) {
+      columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
+      columns[col].emplace_back(
+          col - 2, -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
+      columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
+                                         2.0 * weight_path_length_ +
+                                         weight_ref_deviation_);
+      ++col_num;
+    }
+
+    for (int col = last_point_col_from_last_col; col < num_of_variables_;
+         ++col) {
+      columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
+      columns[col].emplace_back(
+          col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
+      columns[col].emplace_back(col, weight_fem_pos_deviation_ +
+                                         weight_path_length_ +
+                                         weight_ref_deviation_);
+      ++col_num;
+    }
   }
 
   CHECK_EQ(col_num, num_of_variables_);
