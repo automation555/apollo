@@ -2,6 +2,7 @@ cyber_modules {
   key: "Camera"
   value: {
     dag_files: "/apollo/modules/drivers/camera/dag/dev_kit_camera.dag"
+    dag_files: "/apollo/modules/drivers/video/dag/video.dag"
     required_for_safety: false
   }
 }
@@ -78,12 +79,6 @@ cyber_modules {
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
   }
 }
-cyber_modules {
-  key: "TaskManager"
-  value: {
-    dag_files: "/apollo/modules/task_manager/dag/task_manager.dag"
-  }
-}
 modules {
   key: "Recorder"
   value: {
@@ -92,6 +87,7 @@ modules {
     process_monitor_config {
       command_keywords: "cyber_recorder record"
     }
+    required_for_safety: false
   }
 }
 monitored_components {
@@ -114,6 +110,7 @@ monitored_components {
         insufficient_space_error: 32
       }
     }
+    required_for_safety: false
   }
 }
 monitored_components {

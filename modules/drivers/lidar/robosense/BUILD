@@ -1,37 +1,49 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 ROBOSENSE_COPTS = ['-DMODULE_NAME=\\"robosense\\"']
 
-install(
-    name = "install",
-    data = [
-        ":runtime_data",
-    ],
-    targets = [
-        ":librobosense_driver_component.so",
-    ],
-)
-
-filegroup(
-    name = "runtime_data",
-    srcs = glob([
-        "conf/*.txt",
-        "conf/*.conf",
-        "dag/*.dag",
-        "launch/*.launch",
-        "param/**",
-    ]),
-)
-
 cc_binary(
     name = "librobosense_driver_component.so",
     linkshared = True,
     linkstatic = False,
-    deps = ["//modules/drivers/lidar/robosense/driver:robosense_driver_component_lib"],
+    deps = [":robosense_driver_component_lib"],
+)
+
+cc_library(
+    name = "robosense_driver_component_lib",
+    srcs = [
+        "driver/robosense_driver_component.cc",
+    ],
+    hdrs = [
+        "driver/robosense_driver_component.h",
+    ],
+    copts = ROBOSENSE_COPTS,
+    deps = [":driver"],
+)
+
+cc_library(
+    name = "driver",
+    srcs = [
+        "driver/driver.cpp",
+        "driver/utility.cpp",
+        "input/input.cpp",
+    ],
+    hdrs = [
+        "driver/driver.h",
+        "driver/utility.h",
+        "input/input.h",
+    ],
+    copts = ROBOSENSE_COPTS,
+    deps = [
+        ":decoder_factory",
+        "//cyber",
+        "//modules/common/util",
+        "//modules/drivers/proto:pointcloud_cc_proto",
+        "//modules/drivers/lidar/robosense/proto:robosense_proto",
+    ],
 )
 
 cc_library(

@@ -1,38 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
-load("//tools/install:install.bzl", "install")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
 HESAI_COPTS = ['-DMODULE_NAME=\\"hesai\\"']
 
-install(
-    name = "install",
-    data = [
-        ":runtime_data",
-    ],
-    targets = [
-        "libhesai_driver_component.so",
-    ],
-)
-
-filegroup(
-    name = "runtime_data",
-    srcs = glob([
-        "conf/*.txt",
-        "conf/*.conf",
-        "dag/*.dag",
-        "launch/*.launch",
-    ]),
-)
-
 cc_binary(
     name = "libhesai_driver_component.so",
     linkshared = True,
     linkstatic = False,
     deps = [
+        ":hesai_component",
         ":hesai_convert_component",
-        "//modules/drivers/lidar/hesai/driver:hesai_component",
     ],
 )
 
@@ -42,10 +21,36 @@ cc_library(
     hdrs = ["parser/hesai_convert_component.h"],
     copts = HESAI_COPTS,
     deps = [
+        ":driver",
         ":parser_factory",
         "//cyber",
-        "//modules/drivers/lidar/hesai/driver",
-        "//modules/drivers/lidar/proto:hesai_config_cc_proto",
+        "//modules/drivers/lidar/hesai/proto:config_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "hesai_component",
+    srcs = ["driver/hesai_component.cc"],
+    hdrs = ["driver/hesai_component.h"],
+    copts = HESAI_COPTS,
+    deps = [
+        ":driver",
+        ":parser_factory",
+        "//cyber",
+        "//modules/drivers/lidar/hesai/proto:config_cc_proto",
+    ],
+)
+
+cc_library(
+    name = "driver",
+    srcs = ["driver/driver.cc"],
+    hdrs = ["driver/driver.h"],
+    copts = HESAI_COPTS,
+    deps = [
+        ":parser",
+        ":type_defs",
+        ":udp_input",
+        "//cyber",
     ],
 )
 
@@ -93,8 +98,8 @@ cc_library(
         ":tcp_cmd_client",
         ":type_defs",
         "//cyber",
-        "//modules/drivers/lidar/proto:hesai_cc_proto",
-        "//modules/drivers/lidar/proto:hesai_config_cc_proto",
+        "//modules/drivers/lidar/hesai/proto:config_cc_proto",
+        "//modules/drivers/lidar/hesai/proto:hesai_cc_proto",
         "//modules/drivers/proto:pointcloud_cc_proto",
     ],
 )

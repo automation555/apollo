@@ -18,37 +18,37 @@
 # Fail on first error.
 set -e
 
-MY_MODE="${1:-download}"
+MY_MODE="${1:-build}"
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 . ./installer_base.sh
 
 ARCH="$(uname -m)"
+if [ "${ARCH}" != "x86_64" ]; then
+    warning "adv_plat is not ready for ${ARCH}. Skipped."
+    exit 0
+fi
 
 DEST_DIR="${PKGS_DIR}/adv_plat"
-[[ -d ${DEST_DIR} ]] && rm -rf ${DEST_DIR}
-mkdir -p ${DEST_DIR}
+[[ -d ${DEST_DIR} ]] || mkdir -p ${DEST_DIR}
 
-if [[ "${MY_MODE}" == "download" ]]; then
-    if [[ "${ARCH}" == "x86_64" ]]; then
-        PKG_NAME="adv_plat-3.0.1-x86_64.tar.gz"
-        CHECKSUM="3853ff381f8cb6e1681c73e7b4fbc004e950b83db890e3fa0bab9bf6685114ac"
-        DOWNLOAD_LINK="https://apollo-system.cdn.bcebos.com/archive/6.0/${PKG_NAME}"
-        download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
+if [ "${MY_MODE}" = "download" ]; then
+    PKG_NAME="adv_plat-3.0-x86_64.tar.gz"
+    CHECKSUM="1c4a0e205ab2940fc547e5c61b2e181688d4396db2a699f65539add6e10b8150"
+    DOWNLOAD_LINK="https://apollo-platform-system.bj.bcebos.com/archive/6.0/${PKG_NAME}"
 
-        tar xzf ${PKG_NAME}
+    download_if_not_cached "${PKG_NAME}" "${CHECKSUM}" "${DOWNLOAD_LINK}"
 
-        # Note(storypku): workaround for the issue that adv_plat built on ubuntu 20.04 host
-        # can't work properly for camera driver
-        EXTRACTED_PKG="${PKG_NAME%%.tar.gz}"
-        mv -f  ${EXTRACTED_PKG}/* ${DEST_DIR}/
-        echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
-        ldconfig
+    tar xzf ${PKG_NAME}
 
-        # cleanup
-        rm -rf ${EXTRACTED_PKG} ${PKG_NAME}
-        exit 0
-    fi
+    mv adv_plat/include ${DEST_DIR}/include
+    mv adv_plat/lib     ${DEST_DIR}/lib
+
+    echo "${DEST_DIR}/lib" >> "${APOLLO_LD_FILE}"
+    ldconfig
+
+    rm -r ${PKG_NAME} adv_plat
+    exit 0
 fi
 
 #info "Git clone https://github.com/ApolloAuto/apollo-contrib.git"
@@ -96,3 +96,4 @@ pushd ${OUT_DIR}
 popd
 
 rm -rf ${PKG_NAME} apollo-contrib
+

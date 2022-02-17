@@ -18,10 +18,6 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 
 bazel_skylib_workspace()
 
-load("@bazel_skylib//lib:versions.bzl", "versions")
-
-versions.check(minimum_bazel_version = "3.7.0")
-
 http_archive(
     name = "rules_proto",
     sha256 = "602e7161d9195e50246177e7c55b2f39950a9cf7366f74ed5f22fd45750cd208",
@@ -40,14 +36,30 @@ rules_proto_toolchains()
 
 http_archive(
     name = "rules_python",
-    sha256 = "b6d46438523a3ec0f3cead544190ee13223a52f6a6765a29eae7b7cc24cc83a0",
+    sha256 = "b5668cde8bb6e3515057ef465a35ad712214962f0b3a314e551204266c7be90c",
+    strip_prefix = "rules_python-0.0.2",
     urls = [
-        "https://apollo-system.cdn.bcebos.com/archive/6.0/rules_python-0.1.0.tar.gz",
-        "https://github.com/bazelbuild/rules_python/releases/download/0.1.0/rules_python-0.1.0.tar.gz",
+        "https://apollo-system.cdn.bcebos.com/archive/6.0/rules_python-0.0.2.tar.gz",
+        "https://github.com/bazelbuild/rules_python/releases/download/0.0.2/rules_python-0.0.2.tar.gz",
     ],
 )
 
+load("@rules_python//python:repositories.bzl", "py_repositories")
+
+py_repositories()
+
+# Only needed if using the packaging rules.
+# load("@rules_python//python:pip.bzl", "pip_repositories")
+# pip_repositories()
+
 # load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
+# See https://github.com/bazelbuild/bazel/issues/11406
+# maybe(
+#    http_archive,
+#    name = "boringssl",
+#    sha256 = "fb236ae74676dba515e1230aef4cc69ab265af72fc08784a6755a319dd013ca6",
+#    urls = ["https://apollo-platform-system.bj.bcebos.com/archive/6.0/boringssl-83da28a68f32023fd3b95a8ae94991a07b1f6c62.tar.gz"],
+# )
 # grpc
 http_archive(
     name = "com_github_grpc_grpc",
@@ -66,3 +78,16 @@ grpc_deps()
 load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
 
 grpc_extra_deps()
+
+#new_local_repository(
+#    name = "mkldnn",
+#    build_file = "third_party/mkldnn.BUILD",
+#    path = "/usr/local/apollo/local_third_party/mkldnn",
+#)
+#
+# mklml
+# new_local_repository(
+#    name = "mklml",
+#    build_file = "third_party/mklml.BUILD",
+#    path = "/usr/local/apollo/local_third_party/mklml",
+# )

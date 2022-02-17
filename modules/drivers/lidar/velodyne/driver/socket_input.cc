@@ -106,7 +106,7 @@ int SocketInput::get_firing_data_packet(VelodynePacket *pkt) {
     if (nbytes < 0) {
       if (errno != EWOULDBLOCK) {
         AERROR << "recvfail from port " << port_;
-        return RECEIVE_FAIL;
+        return RECIEVE_FAIL;
       }
     }
 
