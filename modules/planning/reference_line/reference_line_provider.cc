@@ -114,7 +114,6 @@ void ReferenceLineProvider::UpdateVehicleState(
 }
 
 bool ReferenceLineProvider::Start() {
-  is_stop_ = false;
   if (FLAGS_use_navigation_mode) {
     return true;
   }
@@ -127,13 +126,6 @@ bool ReferenceLineProvider::Start() {
     task_future_ = cyber::Async(&ReferenceLineProvider::GenerateThread, this);
   }
   return true;
-}
-
-void ReferenceLineProvider::Wait() {
-  is_stop_ = true;
-  if (FLAGS_enable_reference_line_provider_thread) {
-    task_future_.wait();
-  }
 }
 
 void ReferenceLineProvider::Stop() {
@@ -197,7 +189,6 @@ void ReferenceLineProvider::UpdateReferenceLine(
 
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
-    is_reference_line_updated_ = true;
     static constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
     const double start_time = Clock::NowInSeconds();
@@ -337,9 +328,10 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
   std::vector<std::string> left_neighbor_lane_ids;
   auto left_lane_ptr = adc_lane_way_point.lane;
   while (left_lane_ptr != nullptr &&
-         left_lane_ptr->lane().left_neighbor_forward_lane_id_size() > 0) {
+         left_lane_ptr->inner_object().left_neighbor_forward_lane_id_size() >
+             0) {
     auto neighbor_lane_id =
-        left_lane_ptr->lane().left_neighbor_forward_lane_id(0);
+        left_lane_ptr->inner_object().left_neighbor_forward_lane_id(0);
     left_neighbor_lane_ids.emplace_back(neighbor_lane_id.id());
     left_lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
@@ -352,9 +344,10 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
   std::vector<std::string> right_neighbor_lane_ids;
   auto right_lane_ptr = adc_lane_way_point.lane;
   while (right_lane_ptr != nullptr &&
-         right_lane_ptr->lane().right_neighbor_forward_lane_id_size() > 0) {
+         right_lane_ptr->inner_object().right_neighbor_forward_lane_id_size() >
+             0) {
     auto neighbor_lane_id =
-        right_lane_ptr->lane().right_neighbor_forward_lane_id(0);
+        right_lane_ptr->inner_object().right_neighbor_forward_lane_id(0);
     right_neighbor_lane_ids.emplace_back(neighbor_lane_id.id());
     right_lane_ptr = hdmap->GetLaneById(neighbor_lane_id);
   }
@@ -405,8 +398,9 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       // take the id of the first adjacent lane on the left of adc as
       // the nearest_neighbor_lane_id
       lane_change_type = routing::LEFT;
-      nearest_neighbor_lane_id =
-          adc_lane_way_point.lane->lane().left_neighbor_forward_lane_id(0).id();
+      nearest_neighbor_lane_id = adc_lane_way_point.lane->inner_object()
+                                     .left_neighbor_forward_lane_id(0)
+                                     .id();
     } else if (right_neighbor_lane_ids.end() !=
                std::find(right_neighbor_lane_ids.begin(),
                          right_neighbor_lane_ids.end(),
@@ -415,7 +409,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       // take the id  of the first adjacent lane on the right of adc as
       // the nearest_neighbor_lane_id
       lane_change_type = routing::RIGHT;
-      nearest_neighbor_lane_id = adc_lane_way_point.lane->lane()
+      nearest_neighbor_lane_id = adc_lane_way_point.lane->inner_object()
                                      .right_neighbor_forward_lane_id(0)
                                      .id();
     }
@@ -489,10 +483,11 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
 
   // get lanes that exist in both map and navigation paths as valid lanes
   std::vector<hdmap::LaneInfoConstPtr> valid_lanes;
-  std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
-               [&](hdmap::LaneInfoConstPtr ptr) {
-                 return navigation_lane_ids.count(ptr->lane().id().id()) > 0;
-               });
+  std::copy_if(
+      lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
+      [&](hdmap::LaneInfoConstPtr ptr) {
+        return navigation_lane_ids.count(ptr->inner_object().id().id()) > 0;
+      });
   if (valid_lanes.empty()) {
     AERROR << "no valid lane found within " << kMaxDistance
            << " meters with heading " << state.heading();
