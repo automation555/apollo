@@ -99,7 +99,7 @@ Status PathBoundsDecider::Process(
                                          kPathBoundsDeciderResolution,
                                          fallback_path_bound_pair);
   candidate_path_boundaries.back().set_label("fallback");
-  RecordDebugInfo(fallback_path_bound, "fallback", reference_line_info);
+
   // If pull-over is requested, generate pull-over path boundary.
   auto* pull_over_status = injector_->planning_context()
                                ->mutable_planning_status()
@@ -127,8 +127,7 @@ Status PathBoundsDecider::Process(
           std::get<0>(pull_over_path_bound[0]), kPathBoundsDeciderResolution,
           pull_over_path_bound_pair);
       candidate_path_boundaries.back().set_label("regular/pullover");
-      RecordDebugInfo(pull_over_path_bound, "regular/pullover",
-                      reference_line_info);
+
       reference_line_info->SetCandidatePathBoundaries(
           std::move(candidate_path_boundaries));
       ADEBUG << "Completed pullover and fallback path boundaries generation.";
@@ -182,8 +181,7 @@ Status PathBoundsDecider::Process(
         std::get<0>(lanechange_path_bound[0]), kPathBoundsDeciderResolution,
         lanechange_path_bound_pair);
     candidate_path_boundaries.back().set_label("regular/lanechange");
-    RecordDebugInfo(lanechange_path_bound, "regular/lanechange",
-                    reference_line_info);
+    RecordDebugInfo(lanechange_path_bound, "", reference_line_info);
     reference_line_info->SetCandidatePathBoundaries(
         std::move(candidate_path_boundaries));
     ADEBUG << "Completed lanechange and fallback path boundaries generation.";
@@ -253,10 +251,9 @@ Status PathBoundsDecider::Process(
         // regular_self_path_bound = regular_path_bound;
         break;
     }
-    auto debug_str =
-        absl::StrCat("regular/", path_label, "/", borrow_lane_type);
-    RecordDebugInfo(regular_path_bound, debug_str, reference_line_info);
-    candidate_path_boundaries.back().set_label(debug_str);
+    // RecordDebugInfo(regular_path_bound, "", reference_line_info);
+    candidate_path_boundaries.back().set_label(
+        absl::StrCat("regular/", path_label, "/", borrow_lane_type));
     candidate_path_boundaries.back().set_blocking_obstacle_id(
         blocking_obstacle_id);
   }
@@ -506,10 +503,8 @@ Status PathBoundsDecider::GeneratePullOverPathBound(
         std::get<1>(pull_over_configuration));
     pull_over_status->mutable_position()->set_z(0.0);
     pull_over_status->set_theta(std::get<2>(pull_over_configuration));
-    pull_over_status->set_length_front(
-        VehicleConfigHelper::GetConfig().vehicle_param().length() / 2.0);
-    pull_over_status->set_length_back(
-        VehicleConfigHelper::GetConfig().vehicle_param().length() / 2.0);
+    pull_over_status->set_length_front(FLAGS_obstacle_lon_start_buffer);
+    pull_over_status->set_length_back(FLAGS_obstacle_lon_end_buffer);
     pull_over_status->set_width_left(
         VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0);
     pull_over_status->set_width_right(
@@ -577,17 +572,21 @@ int PathBoundsDecider::IsPointWithinPathBound(
          std::get<0>(path_bound[idx_after]) < point_sl.s()) {
     ++idx_after;
   }
-  ADEBUG << "The idx_after = " << idx_after;
-  ADEBUG << "The boundary is: "
-         << "[" << std::get<1>(path_bound[idx_after]) << ", "
-         << std::get<2>(path_bound[idx_after]) << "].";
-  ADEBUG << "The point is at: " << point_sl.l();
-  int idx_before = idx_after - 1;
-  if (std::get<1>(path_bound[idx_before]) <= point_sl.l() &&
-      std::get<2>(path_bound[idx_before]) >= point_sl.l() &&
-      std::get<1>(path_bound[idx_after]) <= point_sl.l() &&
-      std::get<2>(path_bound[idx_after]) >= point_sl.l()) {
+  if (idx_after == 0) {
     return idx_after;
+  } else {
+    ADEBUG << "The idx_after = " << idx_after;
+    ADEBUG << "The boundary is: "
+           << "[" << std::get<1>(path_bound[idx_after]) << ", "
+           << std::get<2>(path_bound[idx_after]) << "].";
+    ADEBUG << "The point is at: " << point_sl.l();
+    int idx_before = idx_after - 1;
+    if (std::get<1>(path_bound[idx_before]) <= point_sl.l() &&
+        std::get<2>(path_bound[idx_before]) >= point_sl.l() &&
+        std::get<1>(path_bound[idx_after]) <= point_sl.l() &&
+        std::get<2>(path_bound[idx_after]) >= point_sl.l()) {
+      return idx_after;
+    }
   }
   ADEBUG << "Laterally outside the boundary.";
   return -1;
@@ -696,8 +695,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
 
   // Search for a feasible location for pull-over.
   const double pull_over_space_length =
-      VehicleConfigHelper::GetConfig().vehicle_param().length() * kPulloverLonSearchCoeff +
-      FLAGS_obstacle_lon_start_buffer + FLAGS_obstacle_lon_end_buffer;
+      kPulloverLonSearchCoeff *
+          VehicleConfigHelper::GetConfig().vehicle_param().length() -
+      FLAGS_obstacle_lon_start_buffer - FLAGS_obstacle_lon_end_buffer;
   const double pull_over_space_width =
       (kPulloverLatSearchCoeff - 1.0) *
       VehicleConfigHelper::GetConfig().vehicle_param().width();
@@ -1950,13 +1950,13 @@ void PathBoundsDecider::RecordDebugInfo(
   // Insert the transformed PathData into the simulator display.
   auto* ptr_display_path_1 =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_display_path_1->set_name("planning_path_boundary_1" + debug_name);
+  ptr_display_path_1->set_name("planning_path_boundary_1");
   ptr_display_path_1->mutable_path_point()->CopyFrom(
       {left_path_data.discretized_path().begin(),
        left_path_data.discretized_path().end()});
   auto* ptr_display_path_2 =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_display_path_2->set_name("planning_path_boundary_2" + debug_name);
+  ptr_display_path_2->set_name("planning_path_boundary_2");
   ptr_display_path_2->mutable_path_point()->CopyFrom(
       {right_path_data.discretized_path().begin(),
        right_path_data.discretized_path().end()});
