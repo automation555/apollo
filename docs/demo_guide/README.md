@@ -1,60 +1,55 @@
-# Run Simulation with Offline Record
+# Run Offline Demo
 
-This document provides a step-by-step guide on how to run simulation with a demo
-offline record, in case you don't have the required hardware.
+Apollo provides a method to run simulation if you do not have the required
+hardware.
 
-## Preparation Work
+Set up the docker release environment by following the instructions in the
+[Install docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#docker)
+section of the
+[Build and Release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md)
+page.
 
-Suppose you have followed the
-[Apollo Software Installation Guide](../quickstart/apollo_software_installation_guide.md).
-You have cloned Apollo's GitHub repo, all the software pre-requisites were
-installed correctly.
+Setup steps:
 
-## Start and enter Apollo development Docker container
+1. Start the docker release environment using the command:
 
-The following commands are assumed to run from `$APOLLO_ROOT_DIR`.
+    ```
+    bash docker/scripts/dev_start.sh
+    ```
 
-```
-bash docker/scripts/dev_start.sh
-bash docker/scripts/dev_into.sh
-```
+2. Enter the docker release environment:
 
-## Build Apollo
+    ```
+    bash docker/scripts/dev_into.sh
+    ```
 
-Run the following command to build Apollo inside Docker:
+3. Build Apollo in the Container:
+    ```
+    bash apollo.sh build
+    ```
+    `Note:` If you do not have a GPU, you can use the following script instead
 
-```
-./apollo.sh build
-```
+    ```
+    bash apollo.sh build_cpu
+    ```
+4. Bootstrap to start ros call and Monitor module and Dreamview
+    ```
+    bash scripts/bootstrap.sh
+    ```
 
-Note:
+5. Now you can play the rosbag:
 
-> The script will auto-detect whether it was a CPU only build or a GPU build.
+    ```
+    sudo python docs/demo_guide/rosbag_helper.py demo_2.0.bag #download rosbag
+    rosbag play demo_2.0.bag --loop
+    ```
 
-## Start Dreamview
+    The `--loop` option enables rosbag to keep playing the bag in a loop
+    playback mode.
 
-To start the Monitor module and Dreamview
-backend, run:
-
-```
-bash scripts/bootstrap.sh
-```
-
-## Download and play the demo record
-
-```
-python3 docs/demo_guide/record_helper.py demo_3.5.record
-cyber_recorder play -f demo_3.5.record --loop
-```
-
-Note:
-
-> The `--loop` option enables record to keep playing in a loop playback mode.
-
-## Open <http://127.0.0.1:8888> in your favorate browser (e.g. Chrome) to access Apollo Dreamview
-
-The following screen should be shown to you and the car in Dreamview now moves around!
-
-![](images/dv_trajectory.png)
+6. Open Chrome and go to **localhost:8888** to access Apollo Dreamview, which
+   opens the screen below.
+    ![](images/dv_trajectory.png)
+   The car in Dreamview is happy to move around!
 
 Congratulations!

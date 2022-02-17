@@ -20,13 +20,24 @@
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
-. ./installer_base.sh
 
-apt_get_update_and_install \
-    coinor-libipopt-dev
+apt-get install -y libblas-dev liblapack-dev gfortran
 
-#FIXME(all): dirty hack here.
-sed -i '/#define __IPSMARTPTR_HPP__/a\#define HAVE_CSTDDEF' \
-    /usr/include/coin/IpSmartPtr.hpp
+wget https://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.8.zip -O Ipopt-3.12.8.zip
+unzip Ipopt-3.12.8.zip
 
-# Source Code Package Link: https://github.com/coin-or/Ipopt/releases
+pushd Ipopt-3.12.8/ThirdParty/Mumps
+bash get.Mumps
+popd
+
+pushd Ipopt-3.12.8
+./configure --build=x86_64
+make -j8 all
+make install
+mkdir -p /usr/local/ipopt
+cp -r include /usr/local/ipopt/ && cp -r lib /usr/local/ipopt/
+popd
+
+# Clean up.
+apt-get clean && rm -rf /var/lib/apt/lists/*
+rm -fr Ipopt-3.12.8.zip Ipopt-3.12.8

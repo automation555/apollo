@@ -14,21 +14,21 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <errno.h>
 #include <fcntl.h>
 #include <linux/netlink.h>
 #include <linux/serial.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
-#include <cerrno>
-#include <cstring>
-#include <ctime>
 #include <thread>
 
-#include "cyber/cyber.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/drivers/gnss/stream/stream.h"
 
@@ -113,8 +113,7 @@ SerialStream::SerialStream(const char* device_name, speed_t baud_rate,
 SerialStream::~SerialStream() { this->close(); }
 
 void SerialStream::open(void) {
-  int fd = 0;
-  fd = ::open(device_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+  int fd = ::open(device_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
   if (fd == -1) {
     switch (errno) {
       case EINTR:
@@ -214,7 +213,7 @@ bool SerialStream::configure_port(int fd) {
   ::tcsetattr(fd, TCSANOW, &options);
 
   // Update byte_time_ based on the new settings.
-  uint32_t bit_time_us = static_cast<uint32_t>(1e6 / 115200);
+  uint32_t bit_time_us = 1e6 / 115200;
   byte_time_us_ = bit_time_us * (1 + bytesize_ + parity_ + stopbits_);
   return true;
 }
@@ -248,7 +247,7 @@ void SerialStream::close(void) {
 }
 
 bool SerialStream::Disconnect() {
-  if (!is_open_) {
+  if (is_open_ == false) {
     // not open
     return false;
   }
@@ -282,12 +281,11 @@ size_t SerialStream::read(uint8_t* buffer, size_t max_length) {
   }
 
   ssize_t bytes_read = 0;
-  ssize_t bytes_current_read = 0;
 
   wait_readable(10000);  // wait 10ms
 
   while (max_length > 0) {
-    bytes_current_read = ::read(fd_, buffer, max_length);
+    ssize_t bytes_current_read = ::read(fd_, buffer, max_length);
     if (bytes_current_read < 0) {
       switch (errno) {
         case EAGAIN:

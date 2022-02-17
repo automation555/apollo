@@ -35,7 +35,7 @@ For questions regarding Dreamview icons refer to the
 
 ## Onboard Test
 
-1. Plug-in an external hard-drive to any available USB port in the host machine.
+1. Plug-in an external hard-drive to any available USB port in the host machine. 
 
 2. Turn on the vehicle, and then the host machine.
 
@@ -44,13 +44,13 @@ For questions regarding Dreamview icons refer to the
 4. Launch DreamView.
 
    Note\: Use your favorite browser to access Dreamview web service in your host
-   machine browser with URL <http://localhost:8888.>
+   machine browser with URL http://localhost:8888.
 
-   ![dreamview_2_5](images/dreamview_2_5.png)
+   ![](images/dreamview_2_5.png)
 
 5. Select Mode, Vehicle and Map.
 
-   ![dreamview_2_5_setup_profile](images/dreamview_2_5_setup_profile.png)
+   ![](images/dreamview_2_5_setup_profile.png)
 
    Note\: You'll be required to setup profile before doing anything else. Click
    the dropdown menu to select **Navigation** mode, the HDMap and vehicle you
@@ -65,23 +65,23 @@ For questions regarding Dreamview icons refer to the
 
    Click the `Setup` button.
 
-   ![dreamview_2_5_setup](images/dreamview_2_5_setup.png)
+   ![](images/dreamview_2_5_setup.png)
 
    Go to **Module Controller** tab, check if all modules and hardware are ready.
    (Note\: In your offline environment, the hardware modules such as GPS,
    CANBus, Velodyne, Camera and Radar cannot be brought up.)
    (Note\: You may need to drive around a bit to get a good GPS signal.)
 
-   ![dreamview_2_5_module_controller](images/dreamview_2_5_module_controller.png)
+   ![](images/dreamview_2_5_module_controller.png)
 
 7. Under `Default Routing` select your desired route.
 
 8. Under Tasks click `Start Auto`. (Note: Be cautious when starting the autonomous
    driving, you should now be in autonomous mode.)
 
-   ![dreamview_2_5_start_auto](images/dreamview_2_5_start_auto.png)
+   ![](images/dreamview_2_5_start_auto.png)
 
 9. After the autonomous testing is complete, under Tasks click `Reset All`, close all
-   windows and shutdown the machine.
+   windows and shutdown the machine. 
 
 10. Remove the hard drive.

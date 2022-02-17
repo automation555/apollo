@@ -19,7 +19,8 @@
  * @brief The class of VehicleController
  */
 
-#pragma once
+#ifndef MODULES_CANBUS_VEHICLE_CONTROLLER_H_
+#define MODULES_CANBUS_VEHICLE_CONTROLLER_H_
 
 #include <unordered_map>
 
@@ -62,8 +63,9 @@ class VehicleController {
    */
   virtual common::ErrorCode Init(
       const VehicleParameter &params,
-      CanSender<ChassisDetail> *const can_sender,
-      MessageManager<ChassisDetail> *const message_manager) = 0;
+      CanSender<::apollo::canbus::ChassisDetail> *const can_sender,
+      MessageManager<::apollo::canbus::ChassisDetail>
+          *const message_manager) = 0;
 
   /**
    * @brief start the vehicle controller.
@@ -126,12 +128,6 @@ class VehicleController {
   virtual void Throttle(double throttle) = 0;
 
   /*
-   * @brief drive with new acceleration/deceleration:-7.0~7.0, unit:m/s^2,
-   * acc:-7.0~7.0, unit:m/s^2
-   */
-  virtual void Acceleration(double acc) = 0;
-
-  /*
    * @brief steering with old angle speed angle:-99.99~0.00~99.99, unit:%,
    * left:+, right:-
    */
@@ -151,8 +147,6 @@ class VehicleController {
   virtual void SetHorn(const control::ControlCommand &command) = 0;
   virtual void SetTurningSignal(const control::ControlCommand &command) = 0;
 
-  virtual void SetLimits() {}
-
  protected:
   virtual Chassis::DrivingMode driving_mode();
   virtual void set_driving_mode(const Chassis::DrivingMode &driving_mode);
@@ -160,8 +154,8 @@ class VehicleController {
  protected:
   canbus::VehicleParameter params_;
   common::VehicleParam vehicle_params_;
-  CanSender<ChassisDetail> *can_sender_ = nullptr;
-  MessageManager<ChassisDetail> *message_manager_ = nullptr;
+  CanSender<::apollo::canbus::ChassisDetail> *can_sender_ = nullptr;
+  MessageManager<::apollo::canbus::ChassisDetail> *message_manager_ = nullptr;
   bool is_initialized_ = false;  // own by derviative concrete controller
   Chassis::DrivingMode driving_mode_ = Chassis::COMPLETE_MANUAL;
   bool is_reset_ = false;  // reset command from control command
@@ -170,3 +164,5 @@ class VehicleController {
 
 }  // namespace canbus
 }  // namespace apollo
+
+#endif  // MODULES_CANBUS_VEHICLE_CONTROLLER_H_

@@ -1,23 +1,21 @@
-import React from 'react';
-import { inject, observer } from 'mobx-react';
+import React from "react";
+import { inject, observer } from "mobx-react";
 
-import SETTING from 'store/config/ControlGraph.yml';
-import ScatterGraph, { generateScatterGraph } from 'components/PNCMonitor/ScatterGraph';
+import SETTING from "store/config/ControlGraph.yml";
+import ScatterGraph, { generateScatterGraph } from "components/PNCMonitor/ScatterGraph";
 
-@inject('store') @observer
+@inject("store") @observer
 export default class ControlMonitor extends React.Component {
-  render() {
-    const { lastUpdatedTime, data } = this.props.store.controlData;
+    render() {
+        const { lastUpdatedTime, data } = this.props.store.controlData;
 
-    if (!lastUpdatedTime) {
-      return null;
-    }
+        if (!lastUpdatedTime) {
+            return null;
+        }
 
-    return (
+        return (
             <div>
-                {generateScatterGraph(SETTING.trajectoryGraph, data.trajectoryGraph, {
-                  pose: data.pose,
-                })}
+                {generateScatterGraph(SETTING.trajectoryGraph, data.trajectoryGraph)}
                 {generateScatterGraph(SETTING.speedGraph, data.speedGraph)}
                 {generateScatterGraph(SETTING.accelerationGraph, data.accelerationGraph)}
                 {generateScatterGraph(SETTING.curvatureGraph, data.curvatureGraph)}
@@ -25,6 +23,6 @@ export default class ControlMonitor extends React.Component {
                 {generateScatterGraph(SETTING.lateralErrorGraph, data.lateralErrorGraph)}
                 {generateScatterGraph(SETTING.headingErrorGraph, data.headingErrorGraph)}
             </div>
-    );
-  }
+        );
+    }
 }

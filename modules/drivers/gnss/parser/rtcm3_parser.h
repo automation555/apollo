@@ -14,7 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#ifndef MODULES_DRIVERS_GNSS_RTCM3_PARSER_H_
+#define MODULES_DRIVERS_GNSS_RTCM3_PARSER_H_
 
 #include <cmath>
 #include <iostream>
@@ -25,7 +26,7 @@
 
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
-#include "cyber/cyber.h"
+#include "ros/include/ros/ros.h"
 
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
@@ -70,3 +71,5 @@ class Rtcm3Parser : public Parser {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
+
+#endif  // MODULES_DRIVERS_GNSS_RTCM3_PARSER_H_

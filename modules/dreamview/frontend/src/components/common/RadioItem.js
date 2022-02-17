@@ -1,48 +1,35 @@
-import React from 'react';
-import classNames from 'classnames';
+import React from "react";
 
 export default class RadioItem extends React.Component {
-  constructor(props) {
-    super(props);
+    constructor(props) {
+        super(props);
 
-    this.setElementRef = (element) => {
-      this.elementRef = element;
-    };
-    this.handleKeyPress = this.handleKeyPress.bind(this);
-  }
-
-  componentDidMount() {
-    if (this.props.autoFocus && this.elementRef) {
-      this.elementRef.focus();
+        this.setElementRef = (element) => {
+            this.elementRef = element;
+        };
     }
-  }
 
-  handleKeyPress(event) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      this.props.onClick();
+    componentDidMount() {
+        if (this.props.autoFocus && this.elementRef) {
+            this.elementRef.focus();
+        }
     }
-  }
 
-  render() {
-    const {
-      id, title, onClick, checked, extraClasses, autoFocus,
-    } = this.props;
+    render() {
+        const { id, title, options, onClick, checked, extraClasses, autoFocus } = this.props;
 
-    return (
-            <ul
-                className={classNames('item', extraClasses)}
+        return (
+            <ul className={extraClasses}
                 tabIndex="0"
                 ref={this.setElementRef}
-                onKeyPress={this.handleKeyPress}
-                onClick={onClick}
-            >
+                onKeyPress={onClick}
+                onClick={onClick} >
                 <li>
                     <input type="radio" name={id} checked={checked} readOnly />
                     <label className="radio-selector-label" htmlFor={title} />
                     <span>{title}</span>
                 </li>
             </ul>
-    );
-  }
+        );
+    }
 }

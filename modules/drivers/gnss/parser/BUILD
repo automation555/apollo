@@ -1,4 +1,3 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
@@ -19,21 +18,19 @@ cc_library(
         "data_parser.h",
         "parser.h",
     ],
-    copts = ["-Ithird_party/rtklib"],
     deps = [
         ":novatel_parser",
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/util:message_util",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_status_cc_proto",
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/monitor_log",
+        "//modules/drivers/gnss:gnss_gflags",
+        "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/util:gnss_util",
-        "//modules/localization/proto:gps_cc_proto",
-        "//modules/localization/proto:imu_cc_proto",
-        "//modules/transform:transform_broadcaster",
-        "@eigen",
-        "@proj",
+        "//modules/localization/proto:gps_proto",
+        "//modules/localization/proto:imu_proto",
+        "@proj4",
+        "@ros//:ros_common",
     ],
 )
 
@@ -45,22 +42,14 @@ cc_library(
         "parser.h",
         "rtcm_decode.h",
     ],
-    copts = ["-Ithird_party/rtklib"],
     deps = [
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/proto:error_code_cc_proto",
-        "//modules/common/proto:geometry_cc_proto",
-        "//modules/common/proto:header_cc_proto",
-        "//modules/drivers/gnss/proto:config_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_best_pose_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_raw_observation_cc_proto",
-        "//modules/drivers/gnss/proto:heading_cc_proto",
-        "//modules/drivers/gnss/proto:imu_cc_proto",
-        "//modules/drivers/gnss/proto:ins_cc_proto",
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/monitor_log",
+        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "//third_party/rtklib",
+        "@ros//:ros_common",
     ],
 )
 
@@ -76,14 +65,16 @@ cc_library(
         "rtcm_decode.h",
         "rtcm_parser.h",
     ],
-    copts = ["-Ithird_party/rtklib"],
     deps = [
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/drivers/gnss/proto:config_cc_proto",
-        "//modules/drivers/gnss/proto:gnss_raw_observation_cc_proto",
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/common/monitor_log",
+        "//modules/drivers/gnss:gnss_gflags",
+        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
-        "//third_party/rtklib",
+        "@ros//:ros_common",
     ],
 )
 

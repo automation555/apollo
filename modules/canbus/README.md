@@ -1,32 +1,21 @@
 # Canbus
 
 ## Introduction
-Canbus accepts and executes control module commands and collects the car's chassis status as feedback to control.
+  Canbus accepts and executes the control command, and collect chassis status as feedback to control.
 
 ## Input
-  * Control commands
+  * Control command
 
 ## Output
   * Chassis status
-  * Chassis detailed status
+  * Chassis detail status
 
 ## Implementation
+  The major components in canbus module are:
+  * Vehicle including vehicle controller and message manager
 
-The major components in canbus module are:
-  * **Vehicle**: the vehicle itself, including its controller and message manager
+  * (CAN client has been moved to `/modules/drivers/canbus` since it is shared by different sensors utilizing canbus protocol)
 
-  * **CAN Client** - CAN client has been moved to `/modules/drivers/canbus` since it is shared by different sensors utilizing the canbus protocol
+  Your own CAN client can be implemented in the folder of *can_client* by inheriting from `CanClient` class. Remember to register your CAN client in `CanClientFactory`.
 
-You can implement your own CAN client in the folder `can_client` by inheriting from the `CanClient` class.
-
-```
-Note:
-Do not forget to register your CAN client in `CanClientFactory`.
-```
-
-You can also implement your own vehicle controller and message manager in the folder `vehicle` by inheriting from `VehicleController` and `MessageManager`.
-
-```
-Note:
-Do not forget to register your vehicle in `VehicleFactory`.
-```
+  Your own vehicle controller and message manager can be implemented in the folder of *vehicle* by inheriting from `VehicleController` and `MessageManager`. Remember to register your vehicle in `VehicleFactory`.

@@ -24,9 +24,6 @@ namespace math {
 
 class KalmanFilterTest : public ::testing::Test {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
- public:
   KalmanFilterTest() : kf_() {}
 
   virtual void SetUp() {

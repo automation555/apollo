@@ -14,20 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_HERMES_CAN_CLIENT_H
+#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_HERMES_CAN_CLIENT_H
 
 #include <string>
 #include <vector>
 
 #include "gflags/gflags.h"
-
 #include "modules/common/proto/error_code.pb.h"
+#include "modules/drivers/canbus/can_client/can_client.h"
+#include "modules/drivers/canbus/common/canbus_consts.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
-#include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/hermes_can/bcan.h"
-#include "modules/drivers/canbus/common/canbus_consts.h"
-
 /**
  * @namespace apollo::drivers::canbus::can
  * @brief apollo::drivers::canbus::can
@@ -107,9 +106,9 @@ class HermesCanClient : public CanClient {
   void SetInited(bool init);
 
  private:
-  bool is_init_ = false;
-  bcan_hdl_t dev_handler_;
-  CANCardParameter::CANChannelId port_;
+  bool _is_init;
+  bcan_hdl_t _dev_handler;
+  CANCardParameter::CANChannelId _card_port;
   bcan_msg_t _send_frames[MAX_CAN_SEND_FRAME_LEN];
   bcan_msg_t _recv_frames[MAX_CAN_RECV_FRAME_LEN];
 };
@@ -118,5 +117,7 @@ class HermesCanClient : public CanClient {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
+
+#endif  // MODULES_DRIVERS_CANBUS_CAN_CLIENT_CLIENT_HERMES_CAN_CLIENT_H
 
 /* vim: set expandtab ts=4 sw=4 sts=4 tw=100: */

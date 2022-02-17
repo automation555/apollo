@@ -18,8 +18,8 @@
 
 #include <utility>
 
-#include "cyber/common/log.h"
-#include "cyber/time/clock.h"
+#include "modules/common/log.h"
+#include "modules/common/time/time.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/controller/lat_controller.h"
 #include "modules/control/controller/lon_controller.h"
@@ -30,7 +30,7 @@ namespace control {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::cyber::Clock;
+using apollo::common::time::Clock;
 
 void ControllerAgent::RegisterControllers(const ControlConf *control_conf) {
   AINFO << "Only support MPC controller or Lat + Lon controllers as of now";
@@ -77,19 +77,19 @@ Status ControllerAgent::InitializeConf(const ControlConf *control_conf) {
   return Status::OK();
 }
 
-Status ControllerAgent::Init(std::shared_ptr<DependencyInjector> injector,
-                             const ControlConf *control_conf) {
-  injector_ = injector;
+Status ControllerAgent::Init(const ControlConf *control_conf) {
   RegisterControllers(control_conf);
-  ACHECK(InitializeConf(control_conf).ok()) << "Failed to initialize config.";
+  CHECK(InitializeConf(control_conf).ok()) << "Fail to initialize config.";
   for (auto &controller : controller_list_) {
-    if (controller == nullptr) {
-      return Status(ErrorCode::CONTROL_INIT_ERROR, "Controller is null.");
-    }
-    if (!controller->Init(injector, control_conf_).ok()) {
-      AERROR << "Controller <" << controller->Name() << "> init failed!";
-      return Status(ErrorCode::CONTROL_INIT_ERROR,
-                    "Failed to init Controller:" + controller->Name());
+    if (controller == NULL || !controller->Init(control_conf_).ok()) {
+      if (controller != NULL) {
+        AERROR << "Controller <" << controller->Name() << "> init failed!";
+        return Status(ErrorCode::CONTROL_INIT_ERROR,
+                      "Failed to init Controller:" + controller->Name());
+      } else {
+        return Status(ErrorCode::CONTROL_INIT_ERROR,
+                      "Failed to init Controller");
+      }
     }
     AINFO << "Controller <" << controller->Name() << "> init done!";
   }

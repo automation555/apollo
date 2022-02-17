@@ -1,30 +1,47 @@
-load("//tools/install:install.bzl", "install", "install_files")
+load("//tools:cpplint.bzl", "cpplint")
 
-package(
-    default_visibility = ["//visibility:public"],
-)
+package(default_visibility = ["//visibility:public"])
 
-install(
-    name = "install",
+cc_library(
+    name = "common",
     deps = [
-        ":pb_common",
-        "//modules/common/data:install",
-        "//modules/common/vehicle_model:install",
+        ":log",
+        ":macro",
+        "@ros//:ros_common",
     ],
 )
 
-install_files(
-    name = "pb_common",
-    dest = "modules/common",
-    files = [
-        "//modules/common/proto:direction_py_pb2",
-        "//modules/common/proto:drive_state_py_pb2",
-        "//modules/common/proto:error_code_py_pb2",
-        "//modules/common/proto:geometry_py_pb2",
-        "//modules/common/proto:header_py_pb2",
-        "//modules/common/proto:pnc_point_py_pb2",
-        "//modules/common/proto:vehicle_signal_py_pb2",
-        "//modules/common/proto:drive_event_py_pb2",
-        "//modules/common/configs/proto:vehicle_config_py_pb2",
+cc_library(
+    name = "macro",
+    hdrs = [
+        "macro.h",
     ],
 )
+
+cc_library(
+    name = "log",
+    hdrs = [
+        "log.h",
+    ],
+    deps = [
+        "@glog",
+    ],
+)
+
+cc_library(
+    name = "apollo_app",
+    srcs = [
+        "apollo_app.cc",
+    ],
+    hdrs = [
+        "apollo_app.h",
+    ],
+    deps = [
+        ":log",
+        "//modules/common/status",
+        "//modules/common/util:string_util",
+        "@ros//:ros_common",
+    ],
+)
+
+cpplint()

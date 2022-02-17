@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import STORE from 'store';
-import { drawSegmentsFromPoints, drawCircle } from 'utils/draw';
+import * as THREE from "three";
+import STORE from "store";
+import { drawSegmentsFromPoints, drawCircle } from "utils/draw";
 
 export default class GNSS {
   constructor() {
@@ -17,7 +17,7 @@ export default class GNSS {
       const material = new THREE.MeshBasicMaterial({
         color: 0x006aff,
         transparent: false,
-        opacity: 0.5,
+        opacity: 0.5
       });
       this.circle = drawCircle(0.2, material);
       scene.add(this.circle);
@@ -26,23 +26,23 @@ export default class GNSS {
     if (!this.base) {
       const config = STORE.hmi.vehicleParam;
       this.base = drawSegmentsFromPoints(
-        [new THREE.Vector3(config.frontEdgeToCenter, -config.leftEdgeToCenter, 0),
+        [ new THREE.Vector3(config.frontEdgeToCenter, -config.leftEdgeToCenter, 0),
           new THREE.Vector3(config.frontEdgeToCenter, config.rightEdgeToCenter, 0),
           new THREE.Vector3(-config.backEdgeToCenter, config.rightEdgeToCenter, 0),
           new THREE.Vector3(-config.backEdgeToCenter, -config.leftEdgeToCenter, 0),
           new THREE.Vector3(config.frontEdgeToCenter, -config.leftEdgeToCenter, 0)],
         0x006aff,
         2,
-        5,
+        5
       );
       scene.add(this.base);
     }
 
-    const visible = STORE.options.showPositionGps;
+    const visible = STORE.options["showPositionGps"];
     const position = coordinates.applyOffset({
       x: world.gps.positionX,
       y: world.gps.positionY,
-      z: 0.01,
+      z: 0,
     });
 
     this.circle.position.set(position.x, position.y, position.z);

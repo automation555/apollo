@@ -17,7 +17,8 @@
 // Converts GPS timestamp from/to UNIX system timestamp.
 // This helper is considering leap second.
 
-#pragma once
+#ifndef MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
+#define MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
 
 #include <stdint.h>
 
@@ -66,7 +67,7 @@ namespace util {
  | 1993 | +1     | 0      | 2017 | 0      | 0      |
  +------+--------+--------+------+--------+--------+
 
- Current TAI - UTC = 37. (mean that: 2017 - 1970/01/01 = 37 seconds)
+ Current TAI − UTC = 37. (mean that: 2017 - 1970/01/01 = 37 seconds)
 */
 
 // We build a lookup table to describe relationship that between UTC and
@@ -138,3 +139,5 @@ T gps2unix(const T gps_seconds) {
 }  // namespace util
 }  // namespace drivers
 }  // namespace apollo
+
+#endif  // MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_

@@ -19,7 +19,8 @@
  * @brief Defines the CanFrame struct and CanClient interface.
  */
 
-#pragma once
+#ifndef MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_H_
+#define MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_H_
 
 #include <cstdint>
 #include <cstring>
@@ -27,11 +28,10 @@
 #include <string>
 #include <vector>
 
+#include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
-#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
-
-#include "cyber/common/log.h"
 #include "modules/drivers/canbus/common/byte.h"
+#include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 
 /**
  * @namespace apollo::drivers::canbus
@@ -138,7 +138,7 @@ class CanClient {
    */
   virtual apollo::common::ErrorCode SendSingleFrame(
       const std::vector<CanFrame> &frames) {
-    CHECK_EQ(frames.size(), 1U)
+    CHECK_EQ(frames.size(), 1)
         << "frames size not equal to 1, actual frame size :" << frames.size();
     int32_t n = 1;
     return Send(frames, &n);
@@ -168,3 +168,5 @@ class CanClient {
 }  // namespace canbus
 }  // namespace drivers
 }  // namespace apollo
+
+#endif  // MODULES_DRIVERS_CANBUS_CAN_CLIENT_CAN_CLIENT_H_

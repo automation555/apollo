@@ -38,7 +38,7 @@ namespace can {
 
 /**
  * @class ExampleCanClient
- * @brief The class which defines an Example CAN client which inherits CanClient.
+ * @brief The class which defines a Example CAN client which inherits CanClient.
  */
 class ExampleCanClient : public CanClient {
  public:
@@ -106,20 +106,20 @@ class ExampleCanClient : public CanClient {
 To register the New CAN Card in CanClientFactory,
 add the following code to `CanClientFactory`:
 ```cpp
-void CanClientFactory::RegisterCanClients() {
-  Register(CANCardParameter::ESD_CAN,
-           []() -> CanClient* { return new can::EsdCanClient(); });
-
-  // register the new CAN card here.
-  Register(CANCardParameter::EXAMPLE_CAN,
-           []() -> CanClient* { return new can::ExampleCanClient(); });
-}
+void CanClientFactory::RegisterCanClients() {  
+  Register(CANCardParameter::ESD_CAN, 
+           []() -> CanClient* { return new can::EsdCanClient(); });  
+  
+  // register the new CAN card here.  
+  Register(CANCardParameter::EXAMPLE_CAN,  
+           []() -> CanClient* { return new can::ExampleCanClient(); });  
+}  
 ```
 
 ### Step 3
 
 Next, you would need to update the config File
-Add the EXAMPLE_CAN into `/modules/drivers/canbus/proto/can_card_parameter.proto`
+Add the EXAMPLE_CAN into `/modules/canbus/proto/can_card_parameter.proto`
 
 ```proto
 message CANCardParameter {
@@ -128,25 +128,13 @@ message CANCardParameter {
     ESD_CAN = 1;
     EXAMPLE_CAN = 2; // add new CAN card here.
   }
-  ... ...
+  ... ... 
 }
 ```
 Update `/modules/canbus/conf/canbus_conf.pb.txt`
 
 ```txt
-... ...
-can_card_parameter {
-  brand:EXAMPLE_CAN
-  type: PCI_CARD // suppose the new can card is PCI_CARD
-  channel_id: CHANNEL_ID_ZERO // suppose the new can card has CHANNEL_ID_ZERO
-}
-... ...
-```
-
-If you use radar, like Conti radar in apollo, its' canbus configuration file should alse be modified. Update `/modules/drivers/radar/conti_radar/conf/conti_radar_conf.pb.txt`
-
-```txt
-... ...
+... ... 
 can_card_parameter {
   brand:EXAMPLE_CAN
   type: PCI_CARD // suppose the new can card is PCI_CARD

@@ -1,176 +1,156 @@
-import {
-  observable, action, computed, extendObservable, isComputed,
-} from 'mobx';
+import { observable, action, computed } from "mobx";
 
-import _ from 'lodash';
+import PARAMETERS from "store/config/parameters.yml";
 import MENU_DATA from 'store/config/MenuData';
 
-export const MONITOR_MENU = Object.freeze({
-  PNC_MONITOR: 'showPNCMonitor',
-  DATA_COLLECTION_MONITOR: 'showDataCollectionMonitor',
-  CONSOLE_TELEOP_MONITOR: 'showConsoleTeleopMonitor',
-  CAR_TELEOP_MONITOR: 'showCarTeleopMonitor',
-  CAMERA_PARAM: 'showCameraView',
-  FUEL_CLIENT: 'showFuelClient',
-});
-
 export default class Options {
-    // Toggles added by planning paths when pnc monitor is on
-    @observable customizedToggles = observable.map();
+    // Side Bar options
+    @observable showModuleController = PARAMETERS.options.defaults.showModuleController;
+    @observable showMenu = PARAMETERS.options.defaults.showMenu;
+    @observable showRouteEditingBar = PARAMETERS.options.defaults.showRouteEditingBar;
+    @observable showPOI = PARAMETERS.options.defaults.showPOI;
+    @observable enableAudioCapture = PARAMETERS.options.defaults.enableAudioCapture;
+    @observable showDataRecorder = PARAMETERS.options.defaults.showDataRecorder;
+    @observable showVideo = PARAMETERS.options.defaults.showVideo;
+    @observable showTasks =
+        OFFLINE_PLAYBACK ? false : PARAMETERS.options.defaults.showTasks;
 
-    constructor() {
-      this.cameraAngleNames = null;
-      this.mainSideBarOptions = [
-        'showTasks',
-        'showModuleController',
-        'showMenu',
-        'showRouteEditingBar',
-        'showDataRecorder',
-      ];
-      this.secondarySideBarOptions = ['showPOI'];
 
-      // Set options and their default values from PARAMETERS.options
-      this.resetOptions();
+    // Layer Menu options
+    @observable cameraAngle = PARAMETERS.options.defaults.cameraAngle;
+    @observable showDecisionMain = PARAMETERS.options.defaults.showDecisionMain;
+    @observable showDecisionObstacle = PARAMETERS.options.defaults.showDecisionObstacle;
+    @observable showPlanning = PARAMETERS.options.defaults.showPlanning;
+    @observable showPlanningCar = PARAMETERS.options.defaults.showPlanningCar;
+    @observable showPlanningReference = PARAMETERS.options.defaults.showPlanningReference;
+    @observable showPlanningDpOptimizer = PARAMETERS.options.defaults.showPlanningDpOptimizer;
+    @observable showPlanningQpOptimizer = PARAMETERS.options.defaults.showPlanningQpOptimizer;
+    @observable showRouting = PARAMETERS.options.defaults.showRouting;
+    @observable showPerceptionLaneMarker = PARAMETERS.options.defaults.showPerceptionLaneMarker;
+    @observable showPredictionMajor = PARAMETERS.options.defaults.showPredictionMajor;
+    @observable showPredictionMinor = PARAMETERS.options.defaults.showPredictionMinor;
+    @observable showObstaclesVehicle = PARAMETERS.options.defaults.showObstaclesVehicle;
+    @observable showObstaclesPedestrian = PARAMETERS.options.defaults.showObstaclesPedestrian;
+    @observable showObstaclesBicycle = PARAMETERS.options.defaults.showObstaclesBicycle;
+    @observable showObstaclesUnknownMovable =
+        PARAMETERS.options.defaults.showObstaclesUnknownMovable;
+    @observable showObstaclesUnknownUnmovable =
+        PARAMETERS.options.defaults.showObstaclesUnknownUnmovable;
+    @observable showObstaclesUnknown =
+        PARAMETERS.options.defaults.showObstaclesUnknown;
+    @observable showObstaclesVirtual =
+        PARAMETERS.options.defaults.showObstaclesVirtual;
+    @observable showObstaclesCipv =
+        PARAMETERS.options.defaults.showObstaclesCipv;
+    @observable showObstaclesVelocity =
+        PARAMETERS.options.defaults.showObstaclesVelocity;
+    @observable showObstaclesHeading =
+        PARAMETERS.options.defaults.showObstaclesHeading;
+    @observable showObstaclesId =
+        PARAMETERS.options.defaults.showObstaclesId;
+    @observable showObstaclesInfo =
+        PARAMETERS.options.defaults.showObstaclesInfo;
+    @observable showPointCloud = PARAMETERS.options.defaults.showPointCloud;
+    @observable showPositionGps = PARAMETERS.options.defaults.showPositionGps;
+    @observable showPositionLocalization = PARAMETERS.options.defaults.showPositionLocalization;
+    @observable showMapCrosswalk = PARAMETERS.options.defaults.showMapCrosswalk;
+    @observable showMapClearArea = PARAMETERS.options.defaults.showMapClearArea;
+    @observable showMapJunction = PARAMETERS.options.defaults.showMapJunction;
+    @observable showMapLane = PARAMETERS.options.defaults.showMapLane;
+    @observable showMapRoad = PARAMETERS.options.defaults.showMapRoad;
+    @observable showMapSignal = PARAMETERS.options.defaults.showMapSignal;
+    @observable showMapStopSign = PARAMETERS.options.defaults.showMapStopSign;
 
-      // Define toggles to hide in layer menu. These include PncMonitor
-      // toggles, which are visible only when PNC Monitor is on.
-      const togglesToHide = {
-        perceptionPointCloud: OFFLINE_PLAYBACK,
-        perceptionLaneMarker: OFFLINE_PLAYBACK,
-        planningCar: OFFLINE_PLAYBACK,
-      };
-      this.togglesToHide = observable(togglesToHide);
-    }
+    // Others
+    @observable showPNCMonitor = PARAMETERS.options.defaults.showPNCMonitor;
+    @observable simControlEnabled = PARAMETERS.options.defaults.enableSimControl;
+    @observable tasksPanelLocked = false;
 
-    @action resetOptions() {
-      const options = {};
-      for (const name in PARAMETERS.options) {
-        let defaultValue = PARAMETERS.options[name].default;
-        if (OFFLINE_PLAYBACK && name === 'showTasks') {
-          defaultValue = false;
-        }
-        if (OFFLINE_PLAYBACK && name === 'showPositionShadow') {
-          defaultValue = true;
-        }
-        options[name] = defaultValue;
-      }
-      extendObservable(this, options);
-    }
+    @observable hideOptionToggle = {
+        'planningCar': true,
+        'planningQpOptimizer': true,
+        'planningDpOptimizer': true,
+        'planningReference': true,
+        'perceptionPointCloud': OFFLINE_PLAYBACK,
+        'perceptionLaneMarker': OFFLINE_PLAYBACK,
+    };
+
+    cameraAngleNames = null;
+    mainSideBarOptions = ['showTasks', 'showModuleController',
+        'showMenu', 'showRouteEditingBar', 'showDataRecorder'];
+    secondarySideBarOptions = ['showPOI', 'enableAudioCapture'];
 
     @computed get showTools() {
-      return this.showTasks
-               || this.showModuleController
-               || this.showMenu
-               || this.showPOI
-               || this.showDataRecorder;
+        return this.showTasks ||
+               this.showModuleController ||
+               this.showMenu ||
+               this.showPOI ||
+               this.showDataRecorder;
     }
 
     @computed get showGeo() {
-      return this.showRouteEditingBar
-               || this.cameraAngle === 'Map'
-               || this.cameraAngle === 'Overhead'
-               || this.cameraAngle === 'Monitor';
+        return this.showRouteEditingBar ||
+               this.cameraAngle === 'Map' ||
+               this.cameraAngle === 'Overhead' ||
+               this.cameraAngle === 'Monitor';
     }
 
-    @computed get showMonitor() {
-      for (const option of Object.values(MONITOR_MENU)) {
-        if (this[option]) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    @computed get monitorName() {
-      if (this.showConsoleTeleopMonitor) {
-        return MONITOR_MENU.CONSOLE_TELEOP_MONITOR;
-      } if (this.showCarTeleopMonitor) {
-        return MONITOR_MENU.CAR_TELEOP_MONITOR;
-      } if (this.showCameraView) {
-        return MONITOR_MENU.CAMERA_PARAM;
-      } if (this.showDataCollectionMonitor) {
-        return MONITOR_MENU.DATA_COLLECTION_MONITOR;
-      } if (this.showPNCMonitor) {
-        return MONITOR_MENU.PNC_MONITOR;
-      } if (this.showFuelClient) {
-        return MONITOR_MENU.FUEL_CLIENT;
-      }
-      return null;
-    }
-
-    @computed get showCameraView() {
-      return this.cameraAngle === 'CameraView';
-    }
-
-    @action toggle(option, isCustomized) {
-      if (isCustomized) {
-        this.customizedToggles.set(option, !this.customizedToggles.get(option));
-      } else {
+    @action toggle(option) {
         this[option] = !this[option];
-      }
 
-      // Disable other mutually exclusive options
-      if (this[option] && this.mainSideBarOptions.includes(option)) {
-        for (const other of this.mainSideBarOptions) {
-          if (other !== option) {
-            this[other] = false;
-          }
+        // Disable other mutually exclusive options
+        if (this[option] && this.mainSideBarOptions.includes(option)) {
+            for (const other of this.mainSideBarOptions) {
+                if (other !== option) {
+                    this[other] = false;
+                }
+            }
         }
-      }
-      const monitorOptions = new Set(Object.values(MONITOR_MENU));
-      if (monitorOptions.has(option)) {
-        for (const other of monitorOptions) {
-          if (other !== option && !isComputed(this, other)) {
-            this[other] = false;
-          }
-        }
-      }
-    }
 
-    @action setCustomizedToggles(toggles) {
-      // Set additional toggle in observable map
-      this.customizedToggles.clear();
-      if (toggles) {
-        this.customizedToggles.merge(toggles);
-      }
+        if (option === "showPNCMonitor") {
+            Object.keys(this.hideOptionToggle).map((toggle) => {
+                if (toggle.startsWith("planning")) {
+                    this.hideOptionToggle[toggle] = !this[option];
+                }
+            });
+        }
     }
 
     isSideBarButtonDisabled(option, enableHMIButtonsOnly, inNavigationMode) {
-      if (!this.mainSideBarOptions.includes(option)
-            && !this.secondarySideBarOptions.includes(option)) {
-        console.warn(`Disable logic for ${option} is not defined, return false.`);
-        return false;
-      }
+        if (!this.mainSideBarOptions.includes(option) &&
+            !this.secondarySideBarOptions.includes(option)) {
+            console.warn(`Disable logic for ${option} is not defined, return false.`);
+            return false;
+        }
 
-      if (option === 'showTasks'
-            || option === 'showModuleController'
-      ) {
-        return false;
-      } if (option === 'showRouteEditingBar') {
-        return enableHMIButtonsOnly || inNavigationMode;
-      } if (option === 'showPOI') {
-        return enableHMIButtonsOnly || this.showRouteEditingBar;
-      }
-      return enableHMIButtonsOnly;
+        if (option === "showTasks" ||
+            option === "showModuleController" ||
+            option === "enableAudioCapture"
+        ) {
+            return false;
+        } else if (option === "showRouteEditingBar") {
+            return enableHMIButtonsOnly || inNavigationMode;
+        } else if (option === "showPOI") {
+            return enableHMIButtonsOnly || this.showRouteEditingBar;
+        } else {
+            return enableHMIButtonsOnly;
+        }
     }
 
     rotateCameraAngle() {
-      if (!this.cameraAngleNames) {
-        const cameraData = MENU_DATA.find((data) => data.id === 'camera');
-
-        this.cameraAngleNames = Object.values(cameraData.data);
-        const shouldFilterCameraView = _.get(PARAMETERS, 'cameraAngle.hasCameraView', true);
-        if (shouldFilterCameraView) {
-          this.cameraAngleNames = this.cameraAngleNames.filter((name) => name !== 'CameraView');
+        if (!this.cameraAngleNames) {
+            const cameraData = MENU_DATA.find(data => {
+                return data.id === "camera";
+            });
+            this.cameraAngleNames = Object.values(cameraData.data);
         }
-      }
 
-      const currentIndex = this.cameraAngleNames.findIndex((name) => name === this.cameraAngle);
-      const nextIndex = (currentIndex + 1) % this.cameraAngleNames.length;
-      this.selectCamera(this.cameraAngleNames[nextIndex]);
+        const currentIndex = this.cameraAngleNames.findIndex(name => name === this.cameraAngle);
+        const nextIndex = (currentIndex + 1) % this.cameraAngleNames.length;
+        this.selectCamera(this.cameraAngleNames[nextIndex]);
     }
 
     @action selectCamera(angleName) {
-      this.cameraAngle = angleName;
+        this.cameraAngle = angleName;
     }
 }

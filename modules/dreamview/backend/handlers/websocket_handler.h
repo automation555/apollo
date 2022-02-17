@@ -18,7 +18,8 @@
  * @file
  */
 
-#pragma once
+#ifndef MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_HANDLER_H_
+#define MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_HANDLER_H_
 
 #include <memory>
 #include <mutex>
@@ -28,7 +29,7 @@
 #include <vector>
 
 #include "CivetServer.h"
-#include "nlohmann/json.hpp"
+#include "third_party/json/json.hpp"
 
 /**
  * @namespace apollo::dreamview
@@ -127,7 +128,7 @@ class WebSocketHandler : public CivetWebSocketHandler {
    * being sent to this connection.
    */
   bool SendData(Connection *conn, const std::string &data,
-                bool skippable = false, int op_code = MG_WEBSOCKET_OPCODE_TEXT);
+                bool skippable = false, int op_code = WEBSOCKET_OPCODE_TEXT);
 
   bool SendBinaryData(Connection *conn, const std::string &data,
                       bool skippable = false);
@@ -171,3 +172,5 @@ class WebSocketHandler : public CivetWebSocketHandler {
 
 }  // namespace dreamview
 }  // namespace apollo
+
+#endif /* MODULES_DREAMVIEW_BACKEND_HANDLERS_WEBSOCKET_HANDLER_H_ */

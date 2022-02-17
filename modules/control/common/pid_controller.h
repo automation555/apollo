@@ -19,7 +19,8 @@
  * @brief Defines the PIDController class.
  */
 
-#pragma once
+#ifndef MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
+#define MODULES_CONTROL_COMMON_PID_CONTROLLER_H_
 
 #include "modules/control/proto/pid_conf.pb.h"
 
@@ -32,7 +33,7 @@ namespace control {
 
 /**
  * @class PIDController
- * @brief A proportional-integral-derivative controller for speed and steering
+ * @brief A proportional–integral–derivative controller for speed and steering
  using defualt integral hold
  */
 class PIDController {
@@ -63,8 +64,6 @@ class PIDController {
    * @return control value based on PID terms
    */
   virtual double Control(const double error, const double dt);
-
-  virtual ~PIDController() = default;
 
   /**
    * @brief get saturation status
@@ -106,3 +105,5 @@ class PIDController {
 
 }  // namespace control
 }  // namespace apollo
+
+#endif  // MODULES_CONTROL_COMMON_PID_CONTROLLER_H_

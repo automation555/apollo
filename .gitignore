@@ -1,14 +1,21 @@
 # Bazel
-bazel-*
-
-# Temporary files
+bazel-apollo
+bazel-apollo_dev
+bazel-bin
+bazel-genfiles
+bazel-out
+bazel-testlogs
+/Debug/
 *.pyc
+*genrule.log
+WORKSPACE
+# temporary files
 *.swp
 *.swo
-
-# Generated files
-*.result
-py_proto
+# generated files
+generated_data_warehouse.conf
+modules/common/data/ssl_keys
+modules/perception/cuda_util/cmake_build
 
 # Eclipse IDE files
 .project
@@ -19,33 +26,48 @@ py_proto
 # IntelliJ files
 .idea
 
-# VS Code files
+# Vscode files
 .vscode
 
-# Atom IDE files
+# atom.io files
 *.gch
 
-# Logs
+# Logs.
+*.stdout
+*.stderr
 nohup.out
 *.bak
-*.stderr
-*.stdout
+*.csv.result
 
 # Editor configs
 .ycm_extra_conf.py
 
+# ROS
+ros_param_server.pid
+.master_snapshot
+
+# third_party
+third_party/ros
+third_party/ros_aarch64/
+third_party/ros_x86_64/
+modules/ros/third_party/fast-rtps
+
 # Data
-/data
+data/prediction
+data/log
+data/core
+data/bag
+data/cov
+data/kv_db
+data/pcd
+data/nfs
+data/map_visual
+modules/data/conf/task_info_template.pb.txt
 modules/tools/ota/update.ini
 modules/tools/ota/vehicle_info.pb.txt
-docker/build/syspkgs.txt
-
-# Localization
-modules/localization/msf/local_map/test_data/ndt_map/map_data
 
 # Doxygen
-cyber/doxy-docs/build
-cyber/doxy-docs/xml
+docs/doxygen
 
 # Esd can lib
 third_party/can_card_library/esd_can/include
@@ -55,25 +77,14 @@ third_party/can_card_library/esd_can/lib
 modules/map/data
 
 # python proto
-*_pb2.py
+py_proto
+
+# gnss conf files
+modules/drivers/gnss/conf/conf_beijing
+modules/drivers/gnss/conf/conf_us
 
 # calibration files
-modules/calibration/data
+modules/calibration/data/mkz056
 
 # Data bag
 docs/demo_guide/*.bag
-docs/demo_guide/*.record
-
-# Bash Environment
-.dev_bash_hist
-
-# bazel cache and others
-.cache/
-.apollo.bazelrc
-.errors.log
-
-# Directory for binary distribution
-output
-
-# Flamegraph files
-tools/FlameGraph

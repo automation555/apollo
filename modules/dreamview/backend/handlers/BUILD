@@ -1,45 +1,51 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
-DREAMVIEW_COPTS = ['-DMODULE_NAME=\\"dreamview\\"']
 
 cc_library(
     name = "websocket_handler",
-    srcs = ["websocket_handler.cc"],
-    hdrs = ["websocket_handler.h"],
-    copts = DREAMVIEW_COPTS,
+    srcs = [
+        "websocket_handler.cc",
+    ],
+    hdrs = [
+        "websocket_handler.h",
+    ],
     deps = [
-        "//cyber/common:log",
+        "//modules/common",
+        "//modules/common/time",
         "//modules/common/util:map_util",
+        "//modules/common/util:string_util",
+        "//third_party/json",
         "@civetweb//:civetweb++",
-        "@com_github_nlohmann_json//:json",
     ],
 )
 
 cc_library(
     name = "image_handler",
-    srcs = ["image_handler.cc"],
-    hdrs = ["image_handler.h"],
-    copts = DREAMVIEW_COPTS,
+    srcs = [
+        "image_handler.cc",
+    ],
+    hdrs = [
+        "image_handler.h",
+    ],
     deps = [
-        "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/common/configs:config_gflags",
-        "//modules/drivers/proto:sensor_image_cc_proto",
+        "//modules/common/adapters:adapter_manager",
+        "//modules/perception/traffic_light/util",
         "@civetweb//:civetweb++",
-        "@opencv//:imgcodecs",
+        "@opencv2//:highgui",
     ],
 )
 
 cc_test(
     name = "websocket_handler_test",
     size = "small",
-    srcs = ["websocket_handler_test.cc"],
+    srcs = [
+        "websocket_handler_test.cc",
+    ],
     deps = [
         ":websocket_handler",
-        "//cyber",
-        "@com_google_googletest//:gtest_main",
+        "//modules/common:log",
+        "@gtest//:main",
     ],
 )
 
