@@ -12,10 +12,11 @@ Apollo7.0相对之前的版本，本次新增了断头路场景，增加了"三�
 输出信息：控制模块可执行的顺滑无碰撞轨迹。
 
 ## Planning 模块架构
+图中绿色发框表示新增断头路场景
 ![](images/DeadEndScenario.png)
 
 ## 场景展示
 ![](images/EnterDeadEnd.png)
-![](images/TuringAround1.png)
-![](images/TuringAround2.png)
+![](images/TurningAround1.png)
+![](images/TurningAround2.png)
 ![](images/OutDeadEnd.png)
