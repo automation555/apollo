@@ -1,64 +1,58 @@
-# Docker environment
+# Working with Docker containers
 
-## Install docker
+## Start and enter Apollo development container
 
-Please follow the
-[official guide to install the docker-ce](https://docs.docker.com/install/linux/docker-ce/ubuntu).
-We also provide a bash script to install docker-ce
+The following commands are assumed to run from Apollo root directory.
 
 ```bash
-bash docker/setup_host/install_docker.sh
-```
-
-Don't forget the
-[post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
-
-
-## Install nvidia-docker (optional)
-
-To use the host machine's GPUs, you need to install nvidia docker.
-
-```bash
-bash docker/setup_host/install_nvidia_docker.sh
-```
-### Mac support
-
-We always recommend to run Apollo container on Ubuntu with the same version of
-the base image, but in case you want to do code development on a Mac, you can
-still try the latest
-[Docker-for-Mac](https://docs.docker.com/docker-for-mac/install)
-
-It runs on a virtual kernel which is similar to use Docker Toolkit + VirtualBox.
-Make sure you understand the [difference](https://docs.docker.com/docker-for-mac/docker-toolbox).
-
-With Mac, lots of Linux bindings are not available, which could cause problems.
-So it's basicly just an environment for code development, while not production.
-
-## Development container
-
-We provide development environment where you can build Apollo from code.
-
-```bash
-cd /path/to/apollo
 bash docker/scripts/dev_start.sh
 bash docker/scripts/dev_into.sh
 ```
 
-The scripts to build the dev-image are also available at docker/build.
+## Start and enter multiple Apollo development containers for multiple users
 
-Note that, within the scripts in this directory, only standard tools that are
-expected to be available in most Linux distributions should be used (e.g., don't
-use realpath).
+Each Apollo development container must be run by each user separately. Switch to the desired user and run:
 
-## Release container
-
-We also distribute release images with runtime environment and pre-compiled
-binaries.
-
-Simply run
 ```bash
-cd /path/to/apollo
-bash docker/scripts/release_start.sh
+bash docker/scripts/dev_start_multiuser.sh
+bash docker/scripts/dev_into.sh
 ```
 
-And then you should be able to see Dreamview at http://localhost:8888.
+Note:
+
+> Multiple Apollo development containers are isolated now and can interact with host environment through exposed ports for Dreamview and Bridge.
+
+### Start Dreamview in multiple Apollo development containers
+
+Run the following command to start the Monitor module and Dreamview backend.
+
+```bash
+bash scripts/bootstrap.sh
+```
+
+_Output_
+
+```bash
+[ OK ] Launched module monitor.
+[ OK ] Launched module dreamview.
+[INFO] Dreamview is running at http://192.168.233.13:8890
+```
+
+The output of the above command will show which URL (`http://192.168.233.13:8890`) is being used for Dreamview.
+
+### Start Bridge in multiple Apollo development containers
+
+Run the following command to start the Bridge.
+
+```bash
+bash scripts/bridge.sh
+```
+
+_Output_
+
+```bash
+[INFO] Bridge port: 9092
+
+```
+
+The output of the above command will show which PORT (`9092`) is being used for Bridge.
