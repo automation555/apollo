@@ -251,6 +251,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   // pull over scenarios
   // Because path reference might also make the end_state != 0
   // we have to exclude this condition here
+  // kStartPulloverDistance the distance start to improve weight to end state
+  // TODO(tianjiao): add this parameter to config file
+  const double kStartPulloverDistance = 30;
   if (end_state[0] != 0 && !is_valid_path_reference) {
     std::vector<double> x_ref(kNumKnots, end_state[0]);
     const auto& pull_over_type = injector_->planning_context()
@@ -258,7 +261,10 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
                                      .pull_over()
                                      .pull_over_type();
     const double weight_x_ref =
-        pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER ? 200.0 : 10.0;
+        pull_over_type == PullOverStatus::EMERGENCY_PULL_OVER ||
+                lat_boundaries.size() * delta_s < kStartPulloverDistance
+            ? 2000.0
+            : 10.0;
     piecewise_jerk_problem.set_x_ref(weight_x_ref, std::move(x_ref));
   }
   // use path reference as a optimization cost function
@@ -280,9 +286,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
       ADEBUG << "i: " << i << ", weight: " << weight_x_ref_vec.at(i);
     }
     piecewise_jerk_problem.set_x_ref(std::move(weight_x_ref_vec),
-                                     std::move(path_reference_l_ref));
+                                     path_reference_l_ref);
   }
-
+  // for debug:here should use std::move
   piecewise_jerk_problem.set_weight_x(w[0]);
   piecewise_jerk_problem.set_weight_dx(w[1]);
   piecewise_jerk_problem.set_weight_ddx(w[2]);
@@ -315,6 +321,16 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
 
   if (!success) {
     AERROR << "piecewise jerk path optimizer failed";
+    std::stringstream ssm;
+    AERROR << "dl bound" << FLAGS_lateral_derivative_bound_default
+           << " jerk bound" << jerk_bound;
+    for (size_t i = 0; i < lat_boundaries.size(); i++) {
+      ssm << lat_boundaries[i].first << " " << lat_boundaries[i].second << ","
+          << ddl_bounds[i].first << " " << ddl_bounds[i].second << ","
+          << path_reference_l_ref[i] << std::endl;
+    }
+    AERROR << "lat boundary, ddl boundary , path reference" << std::endl
+           << ssm.str();
     return false;
   }
 
