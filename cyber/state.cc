@@ -26,7 +26,7 @@ std::atomic<State> g_cyber_state;
 }
 
 State GetState() { return g_cyber_state.load(); }
-
+State GetState1() { return g_cyber_state.load(); }
 void SetState(const State& state) { g_cyber_state.store(state); }
 
 }  // namespace cyber

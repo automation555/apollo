@@ -53,7 +53,7 @@ namespace {
 const std::string& kClockChannel = "/clock";
 const std::string& kClockNode = "clock";
 const std::string& kClockNode1 = "clock";  
-
+const std::string& kClockNode2 = "clock";  
 bool g_atexit_registered = false;
 std::mutex g_mutex;
 std::unique_ptr<Node> clock_node;
